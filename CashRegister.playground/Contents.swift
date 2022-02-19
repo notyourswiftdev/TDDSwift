@@ -31,6 +31,7 @@
 /// THE SOFTWARE.
 
 import XCTest
+import Foundation
 
 class CashRegister {
     
@@ -44,13 +45,20 @@ class CashRegister {
     func addItem(_ cost: Decimal) {
         transactionTotal += cost
     }
+    
+    func acceptCashPayments(_ cash: Decimal) {
+        transactionTotal -= cash
+        availableFunds += cash
+    }
 }
 
 class CashRegisterTests: XCTestCase {
     
     var availableFunds: Decimal!
-    var sut: CashRegister!
     var itemCost: Decimal!
+    var payment: Decimal!
+    
+    var sut: CashRegister!
     
 //    func testInit_createsCashRegister() {
 //        XCTAssertNotNil(CashRegister())
@@ -60,6 +68,7 @@ class CashRegisterTests: XCTestCase {
         super.setUp()
         availableFunds = 100
         itemCost = 42
+        payment = 40.00
         sut = CashRegister(availableFunds: availableFunds)
     }
     
@@ -67,6 +76,7 @@ class CashRegisterTests: XCTestCase {
         availableFunds = nil
         sut = nil
         itemCost = nil
+        payment = nil
         super.tearDown()
     }
     
@@ -83,6 +93,7 @@ class CashRegisterTests: XCTestCase {
     }
     
     func testAddItem_twoItems_addsCostToTransactionTotal() {
+        // Given
         let itemCost2 = Decimal(20)
         let expectedTotal = itemCost + itemCost2
         
@@ -92,6 +103,35 @@ class CashRegisterTests: XCTestCase {
         
         // Then
         XCTAssertEqual(sut.transactionTotal, expectedTotal)
+    }
+    
+    func testAcceptCashPayment_subtractsPaymentFromTransactionTotal() {
+        // Given
+        givenTransactionInProgress()
+        let expected = sut.transactionTotal - payment
+        
+        // When
+        sut.acceptCashPayments(payment)
+        
+        // Then
+        XCTAssertEqual(sut.transactionTotal, expected)
+    }
+    
+    func testAcceptCashPayment_addsPaymentToAvailableFunds() {
+        // Given
+        givenTransactionInProgress()
+        let expected = sut.availableFunds + payment
+        
+        // When
+        sut.acceptCashPayments(payment)
+        
+        // Then
+        XCTAssertEqual(sut.availableFunds, expected)
+    }
+    
+    func givenTransactionInProgress() {
+        sut.addItem(50)
+        sut.addItem(100)
     }
 }
 
