@@ -31,3 +31,68 @@
 /// THE SOFTWARE.
 
 import XCTest
+
+class CashRegister {
+    
+    var availableFunds: Decimal
+    var transactionTotal: Decimal = 0
+    
+    init(availableFunds: Decimal) {
+        self.availableFunds = availableFunds
+    }
+    
+    func addItem(_ cost: Decimal) {
+        transactionTotal += cost
+    }
+}
+
+class CashRegisterTests: XCTestCase {
+    
+    var availableFunds: Decimal!
+    var sut: CashRegister!
+    var itemCost: Decimal!
+    
+//    func testInit_createsCashRegister() {
+//        XCTAssertNotNil(CashRegister())
+//    }
+    
+    override func setUp() {
+        super.setUp()
+        availableFunds = 100
+        itemCost = 42
+        sut = CashRegister(availableFunds: availableFunds)
+    }
+    
+    override func tearDown() {
+        availableFunds = nil
+        sut = nil
+        itemCost = nil
+        super.tearDown()
+    }
+    
+    func testInitAvailableFunds_setsAvailableFunds() {
+        XCTAssertEqual(sut.availableFunds, availableFunds)
+    }
+    
+    func testAddItem_oneItem_addsCostToTransactionTotal() {
+        // When
+        sut.addItem(itemCost)
+        
+        // Then
+        XCTAssertEqual(sut.transactionTotal, itemCost)
+    }
+    
+    func testAddItem_twoItems_addsCostToTransactionTotal() {
+        let itemCost2 = Decimal(20)
+        let expectedTotal = itemCost + itemCost2
+        
+        // When
+        sut.addItem(itemCost)
+        sut.addItem(itemCost2)
+        
+        // Then
+        XCTAssertEqual(sut.transactionTotal, expectedTotal)
+    }
+}
+
+CashRegisterTests.defaultTestSuite.run()
